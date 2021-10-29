@@ -1,0 +1,9 @@
+ExplorerRobot	    KEYWORD1
+motors_pins		    KEYWORD2
+go_forward		    KEYWORD2
+go_back		        KEYWORD2
+stop_car		    KEYWORD2
+turn_left_forward   KEYWORD2
+turn_right_forward  KEYWORD2
+turn_right_back     KEYWORD2
+turn_left_back      KEYWORD2

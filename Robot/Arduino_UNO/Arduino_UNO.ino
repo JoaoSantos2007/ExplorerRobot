@@ -2,19 +2,20 @@
 #include <Ultrasonic.h>
 
 //Motor 1
-int motor1V = ;
-int motor1A = ;
-int motor1B = ;
+int motor1V = 9;
+int motor1A = 8;
+int motor1B = 7;
 
 //Motor 2
-int motor2V = ;
-int motor2A = ;
-int motor2B = ;
+int motor2V = 10;
+
+int motor2A = 4;
+int motor2B = 2;
 
 ExplorerRobot robot(motor1A,motor1B,motor1V,motor2A,motor2B,motor2V);
 
-#define pino_trigger 4
-#define pino_echo 5
+#define pino_trigger A0
+#define pino_echo A1
 
 Ultrasonic ultrasonic(pino_trigger, pino_echo);
 
@@ -25,9 +26,13 @@ float distancia(){
   return(cmMsec);
 }
 
-void apply_rules(cm){
+void apply_rules(float cm){
   if(cm <= 12){
-    robot.stop()
+    robot.stop_car();
+  }else if(cm <= 30){
+    robot.go_forward(100);
+  }else if(cm > 30){
+    robot.go_forward(120);
   }
 }
 
@@ -40,4 +45,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   float cm = distancia();
   apply_rules(cm);
+  Serial.write('A');
+  delay(2000);
+  Serial.write('a');
+  delay(2000);
 }
