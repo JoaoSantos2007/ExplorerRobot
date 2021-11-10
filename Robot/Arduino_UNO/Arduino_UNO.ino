@@ -8,21 +8,26 @@ int motor1B = 7;
 
 //Motor 2
 int motor2V = 10;
-
 int motor2A = 4;
 int motor2B = 2;
 
 ExplorerRobot robot(motor1A,motor1B,motor1V,motor2A,motor2B,motor2V);
 
-#define pino_trigger A0
-#define pino_echo A1
+//Ultrasonic_front
+#define pino_trigger_front A0
+#define pino_echo_front A1
+Ultrasonic ultrasonic1(pino_trigger_front, pino_echo_front);
 
-Ultrasonic ultrasonic(pino_trigger, pino_echo);
+//Ultrasonic_back
+#define pino_trigger_back A2
+#define pino_echo_back A3
+Ultrasonic ultrasonic2(pino_trigger_back, pino_echo_back);
 
-float distancia(){
+
+float distance_front(){
   float cmMsec;
-  long microsec = ultrasonic.timing();
-  cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  long microsec = ultrasonic1.timing();
+  cmMsec = ultrasonic1.convert(microsec, Ultrasonic::CM);
   return(cmMsec);
 }
 
@@ -43,10 +48,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  float cm = distancia();
+  float cm = distance_front();
   apply_rules(cm);
-  Serial.write('A');
+  Serial.print('A');
   delay(2000);
-  Serial.write('a');
+  Serial.print('B');
   delay(2000);
 }

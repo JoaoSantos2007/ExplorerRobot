@@ -1,22 +1,26 @@
-int led_back_left = 2;
+int PIN_LED_BACK_FORWARD;
 
+
+String msg;
+
+#define RXp2 16
+#define TXp2 17
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  pinMode(led_back_left,OUTPUT);
-  //digitalWrite(led_back_left,LOW);
+  pinMode(2, OUTPUT);
+  Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  if(Serial.available()){
-    char c = Serial.read();
-    if(c=='A'){
-      digitalWrite(led_back_left, HIGH);
-    }
-    if(c=='a'){
-      digitalWrite(led_back_left, LOW);
+  if (Serial2.available()) {
+    msg = String(Serial2.readString());
+    Serial.println("Mensagem: " + msg);
+    if (msg == "A") {
+      digitalWrite(2, HIGH);
+    } else {
+      digitalWrite(2, LOW);
     }
   }
 }
