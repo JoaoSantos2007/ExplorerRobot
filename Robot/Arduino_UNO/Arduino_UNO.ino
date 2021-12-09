@@ -1,6 +1,7 @@
 #include <ExplorerRobot.h>
 #include <Ultrasonic.h>
 #include <DHT.h>
+#include <ArduinoJson.h>
 
 //Motor 1
 int motor1V = 9;
@@ -41,7 +42,7 @@ float get_distance_front() {
   return (cmMsec);
 }
 
-//Distância de tras
+//Distância de trás
 float get_distance_back() {
   float cmMsec;
   long microsec = ultrasonic2.timing();
@@ -49,25 +50,27 @@ float get_distance_back() {
   return (cmMsec);
 }
 
+//Temperatura
 float get_temp() {
   float temp = dht.readTemperature();
-  if (isnan(temp)){
-    return(0);
-  }else{
-    return(temp);
+  if (isnan(temp)) {
+    return (0);
+  } else {
+    return (temp);
   }
 }
 
-float get_humidity(){
+//Umidade
+float get_humidity() {
   float humidity = dht.readHumidity();
-  if(isnan(humidity)){
-    return(0);
-  }else{
-    return(humidity);
+  if (isnan(humidity)) {
+    return (0);
+  } else {
+    return (humidity);
   }
 }
 
-
+//Apply rules
 void apply_rules(float cm_front, float cm_back) {
   if (cm_front <= 12) {
     robot.stop_car();
@@ -78,25 +81,55 @@ void apply_rules(float cm_front, float cm_back) {
   }
 }
 
+void get_information() {
+  StaticJsonDocument<256> doc;
+  doc["cm_front"] = get_distance_front();
+  doc["cm_back"] = get_distance_back();
+  doc["temperature"] = get_temp();
+  doc["humidity"] = get_humidity();
+  doc["luminosity"] = analogRead(PIN_LUMINOSITY);
+  char out[256];
+  serializeJson(doc, out);
+  Serial.println(out);
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  dht.begin();
 }
+
 
 void loop() {
   // put your main code here, to run repeatedly:
-  float cm_front = get_distance_front();
-  float cm_back = get_distance_back();
-  float temperaure = get_temp();
-  float humidity = get_humidity();
-  float luminosity = analogRead(PIN_LUMINOSITY);
-  Serial.println("Distância 1: " + String(cm_front) + " | Distância 2:" + String(cm_back));
-  if (Automatic == true) {
-    apply_rules(cm_front, cm_back);
+
+  //Central de Comunicação
+  if (Serial.available()) {
+    String msg = String(Serial.readString());
+    Serial.println("msg: " + msg);
+    if (msg[0] == '#') {
+      if (msg.indexOf("_") != -1) {
+        msg.remove(0, 1);
+        int pos_anderline = msg.indexOf("_");
+        int tamanho_msg = msg.length();
+        String velocidade = "";
+        for (int i = pos_anderline + 1; i < tamanho_msg; i++) {
+          velocidade += msg[i];
+        }
+        msg.remove(pos_anderline, (tamanho_msg - pos_anderline));
+        String command = msg;
+        Serial.println("comando: " + command);
+      }
+    }
   }
 
-  //  Serial.print('A');
-  //  delay(2000);
-  //  Serial.print('B');
-  //  delay(2000);
+
+  if (Automatic == true) {
+    float cm_front = get_distance_front();
+    float cm_back = get_distance_back();
+    apply_rules(cm_front, cm_back);
+  }else{
+//    if command == 
+  }
+
 }
